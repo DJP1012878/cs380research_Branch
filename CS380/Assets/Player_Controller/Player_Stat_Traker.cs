@@ -41,8 +41,13 @@ public class Player_Stat_Traker : MonoBehaviour {
 
     public GameObject spawn;
     public Target path;
-    // Use this for initialization
-    void Start()
+  // Use this for initialization
+  private void Awake()
+  {
+    
+  }
+
+  void Start()
     {
         spawn = GameObject.FindGameObjectWithTag("Spawn");
         //gameObject.transform.position = spawn.transform.position;
@@ -152,6 +157,7 @@ public class Player_Stat_Traker : MonoBehaviour {
 
     public float GetCost(Room room)
     {
+    Debug.Log("Requesting cost of room: " + room);
         return RoomWeights[(int)room];
     }
 }

@@ -41,13 +41,17 @@ public class LevelSystem : MonoBehaviour {
   public bool SetSeed;
   public int seed;
 
-    //Privates
-    List<GameObject> p_SortedRooms;   //Possible Usage to sort by heuristic cost
+  //Privates
+  int p_RoomIndexOffset = 5;
+  float p_TotalHeuristic;
+  public List<int> p_SortedIndex;
+  public List<GameObject> p_SortedRooms;   //Possible Usage to sort by heuristic cost
 
     private void Awake()
     {
         p_SortedRooms = new List<GameObject>();
         m_SpawnedRooms = new List<GameObject>();
+    p_SortedIndex = new List<int>();
 
         if (m_GenerateOnStart)
             GenerateRooms(m_StartHeight, m_StartWidth);
@@ -96,9 +100,9 @@ public class LevelSystem : MonoBehaviour {
 
     //Set a start and goal
     Vector2 startIndex = 
-      new Vector2(Random.Range(0, width - 1), Random.Range(0, height - 1));
+      new Vector2(Random.Range(0, width), Random.Range(0, height));
     Vector2 goalIndex =
-      new Vector2(Random.Range(0, width - 1), Random.Range(0, height - 1));
+      new Vector2(Random.Range(0, width), Random.Range(0, height));
     int goalOffset =
       IndexDistance(startIndex, goalIndex);
     
@@ -106,21 +110,35 @@ public class LevelSystem : MonoBehaviour {
     while (goalOffset < m_MinGoalOffset)
     {
       goalIndex =
-        new Vector2(Random.Range(0, width - 1), Random.Range(0, height - 1));
+        new Vector2(Random.Range(0, width), Random.Range(0, height));
       goalOffset =
         IndexDistance(startIndex, goalIndex);
     }
 
     //Find maximum index distance between the goal and any index
     float maxIndexDistance = 0;
-    if (Mathf.Abs((int)goalIndex.x - width) > Mathf.Abs((int)goalIndex.x - 0))
-      maxIndexDistance += Mathf.Abs((int)goalIndex.x - width);
+    //X Distance
+    if (Mathf.Abs((int)goalIndex.x - (width - 1)) > Mathf.Abs((int)goalIndex.x - 0))
+    {
+      maxIndexDistance += Mathf.Abs((int)goalIndex.x - (width - 1));
+      Debug.Log("Width: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - (width - 1)));
+    }
     else
+    {
       maxIndexDistance += Mathf.Abs((int)goalIndex.x - 0);
-    if (Mathf.Abs((int)goalIndex.y - height) > Mathf.Abs((int)goalIndex.y - 0))
-      maxIndexDistance += Mathf.Abs((int)goalIndex.y - height);
+      Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - 0));
+    }
+    //Y Distance
+    if (Mathf.Abs((int)goalIndex.y - (height - 1)) > Mathf.Abs((int)goalIndex.y - 0))
+    {
+      maxIndexDistance += Mathf.Abs((int)goalIndex.y - (height - 1));
+      Debug.Log("Height: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - (height - 1)));
+    }
     else
-      maxIndexDistance += Mathf.Abs((int)goalIndex.x - 0);
+    {
+      maxIndexDistance += Mathf.Abs((int)goalIndex.y - 0);
+      Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - 0));
+    }
 
     Debug.Log("[LVGEN] Max Index Distance from goal is: " + maxIndexDistance);
     
@@ -130,35 +148,54 @@ public class LevelSystem : MonoBehaviour {
       for (int j = 0; j < width; ++j)
       {
         GameObject spawnedRoom;
-        int mask = 0;                //The number of indexes to mask based on distance
+        int range = 0;                
         //Set mask value
         float indexDistance = 
-          IndexDistance(new Vector2(j, i), startIndex);
+          IndexDistance(new Vector2(j, i), goalIndex);
+        //Debug.Log("Index Distance from: (" + j + ", " + i + ") is " + indexDistance);
         float distanceRatio = indexDistance / maxIndexDistance;
-        //Lock mask so it can only mask up to 75% of the total vector
-        mask +=
-          (int)(((float)p_SortedRooms.Count * .66f) * distanceRatio);
-        Debug.Log("[LVGEN] Mask set to: " + mask +
+        float allowedHeuristic = p_TotalHeuristic * distanceRatio;
+        float currentHeuristic = 0;
+
+        while (currentHeuristic < allowedHeuristic)
+        {
+          //Debug.Log("Total Heuristic: " + p_TotalHeuristic +
+          //  " Allowed Heuristic: " + allowedHeuristic +
+          //  " Current Heurisitc: " + currentHeuristic);
+          currentHeuristic += NavMesh.GetAreaCost(p_SortedIndex[range]);
+          ++range;
+        }
+
+        if (currentHeuristic != allowedHeuristic)
+          --range;
+           
+        //Range should always be at least 50% of the sorted rooms
+        if (range < (p_SortedRooms.Count * .6f))
+        {
+          range = (int)(p_SortedRooms.Count * .6f);
+        }
+
+        Debug.Log("[LVGEN] Range set to: " + range +
                   " at Distance Ratio: " + distanceRatio + 
                   " from index: " + new Vector2(j, i) +
                   " to goal index: " + goalIndex);
 
        bool spawn = false;
        bool goal = false;
-                //Check if start or goal
-                if (i == startIndex.y && j == startIndex.x)
-                {
-                    spawnedRoom = Instantiate(StartRoom);
-                    spawn = true;
-                }
-                else if (i == goalIndex.y && j == goalIndex.x)
-                {
-                    spawnedRoom = Instantiate(GoalRoom);
-                    goal = true;
-                }
-                else
-                    spawnedRoom =
-                      Instantiate(p_SortedRooms[Random.Range(0, p_SortedRooms.Count - mask)]);
+      //Check if start or goal
+      if (i == startIndex.y && j == startIndex.x)
+      {
+          spawnedRoom = Instantiate(StartRoom);
+          spawn = true;
+      }
+      else if (i == goalIndex.y && j == goalIndex.x)
+      {
+          spawnedRoom = Instantiate(GoalRoom);
+          goal = true;
+      }
+      else
+          spawnedRoom =
+            Instantiate(p_SortedRooms[Random.Range(0, range)]);
 
         Vector3 spawnPos = anchor;
         spawnPos.x += m_RoomBaseSize.x * j;
@@ -247,57 +284,55 @@ public class LevelSystem : MonoBehaviour {
   {
     if (p_SortedRooms.Count != 0)
       p_SortedRooms.Clear();
+    if (p_SortedIndex.Count != 0)
+      p_SortedIndex.Clear();
 
     Debug.Log("[LVGEN] Sorting Rooms");
 
-    //Do nothing atm
+    //Find Total Heuristic
+    p_TotalHeuristic = 0;
+    for (int i = p_RoomIndexOffset; i < (int)Room.RoomIndex; ++i)
+    {
+      Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) + 
+        " at index " + i +
+        " to TotalHeuristic.");
+      p_TotalHeuristic += NavMesh.GetAreaCost(i);
+    }
+
+    Debug.Log("[LVGEN] Completed Calculating Total Heuristic");
+
     //Place rooms into Sorted
-    //int j = 0;
-    int len = Rooms.Length;
-    int[] roomSort = new int[len];
-    int[] oldRooms = new int[len];
-
-    for(int i = 0; i < len; ++ i)
-    {  oldRooms[i] = i; }
-
-    for(int i = 0; i < len; ++i)
+    //Push valid room indexes into sorted index list
+    for (int i = p_RoomIndexOffset; i < (int)Room.RoomIndex; ++i)
     {
-        float highestWeight = 0;
-        int highestJ= 0;
-        int j = 0;
-        while ( j < len)
-        {
-            if (oldRooms[j] != -1 && highestWeight < NavMesh.GetAreaCost(oldRooms[j]+ (int)Room.ItemRoomA))
-            {
-               highestWeight = NavMesh.GetAreaCost(oldRooms[j] + (int)Room.ItemRoomA);
-               highestJ = j;
-            }
-            ++j;
-        }
-       roomSort[i] = highestJ;
-       oldRooms[highestJ] = -1;
+      Debug.Log("Index " + i +
+        " returned NavMeshCost: " + NavMesh.GetAreaCost(i));
+      p_SortedIndex.Add(i);
+    }
+    //Sort by heuristic cost
+    p_SortedIndex.Sort(SortByNavMeshValue);
+
+
+    //Create the sorted rooms list
+    for (int i = 0;  i < p_SortedIndex.Count; ++i)
+    {
+      Debug.Log("Adding index: " + (p_SortedIndex[i] - p_RoomIndexOffset)
+        + " to SortedRooms");
+      p_SortedRooms.Add(Rooms[p_SortedIndex[i] - p_RoomIndexOffset]);
     }
 
-    for (int i = 0; i < len; ++i)
-    {
-       p_SortedRooms.Add(Rooms[roomSort[i]]);
-    }
 
-    int count = p_SortedRooms.Count;
-    int added = 0;
-    for(int i = 0; i < count-1; ++i)
-    {
-      for(int j = 0; j <= i; ++j)
-      {
-        p_SortedRooms.Insert(added, p_SortedRooms[(added++) + j]);
-      }
-    }
-        added = 0;
 }
 
   int IndexDistance(Vector2 index1, Vector2 index2)
   {
     return (int)(Mathf.Abs(index1.x - index2.x) + Mathf.Abs(index1.y - index2.y));
+  }
+
+  int SortByNavMeshValue(int index1, int index2)
+  {
+    return NavMesh.GetAreaCost(index2).CompareTo(
+      NavMesh.GetAreaCost(index1));
   }
 
   public void BuildNextLevel()
