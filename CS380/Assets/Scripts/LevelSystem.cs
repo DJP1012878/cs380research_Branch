@@ -283,32 +283,6 @@ public class LevelSystem : MonoBehaviour {
        p_SortedRooms.Add(Rooms[roomSort[i]]);
     }
 
-    //for (int i = 0; i < Rooms.Length; ++i)
-    //{
-    //       // p_SortedRooms.Add(Rooms[i]);
-    //   if (p_SortedRooms.Count == 0)
-    //   {
-    //        p_SortedRooms.Add(Rooms[i]);
-    //   }
-    //   else
-    //   {
-    //       for (j = 0; j < p_SortedRooms.Count; ++j)
-    //       {
-    //           if(NavMesh.GetAreaCost(i+(int)Room.ItemRoomA) > NavMesh.GetAreaCost(j + (int)Room.ItemRoomA))
-    //           {
-    //              //p_SortedRooms.Insert(j, Rooms[i]);
-    //              break;
-    //           }
-    //       }
-    //   
-    //       if (j == p_SortedRooms.Count)
-    //       {
-    //           //p_SortedRooms.Insert(j, Rooms[i]);
-    //
-    //       }
-    //   }
-    //}
-
     int count = p_SortedRooms.Count;
     int added = 0;
     for(int i = 0; i < count-1; ++i)
