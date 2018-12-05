@@ -6,7 +6,14 @@ using UnityEngine.AI;
 
 public class UI_Buddy : MonoBehaviour {
 
-  public Player_Stat_Traker stats;
+    [Header("World Objects")]
+    public Player_Stat_Traker stats;
+    public Target Path;
+    public GameObject arrow;
+    public Renderer Beacon;
+    public LineRenderer String;
+
+    [Header("UI")]
     public Text Item_A_Counter;
     public Text Item_B_Counter;
     public Text Item_A_Weight;
@@ -14,11 +21,32 @@ public class UI_Buddy : MonoBehaviour {
     public Text Hazard_A_Weight;
     public Text Hazard_B_Weight;
 
-    public GameObject arrow;
-  public Renderer Beacon;
-  public LineRenderer String;
 
-	// Use this for initialization
+  public void HazardRatio(float r)
+  {
+    stats.RoomWeights[(int)Room.HazardRoomB] = 1 - r;
+    stats.RoomWeights[(int)Room.HazardRoomB] = r;
+    Path.ReWeight();
+  }
+
+  public void ItemARatio(float r)
+  {
+    stats.RoomWeights[(int)Room.ItemRoomA] = r;
+    Path.ReWeight();
+  }
+
+  public void ItemBRatio(float r)
+  {
+    stats.RoomWeights[(int)Room.ItemRoomB] = r;
+    Path.ReWeight();
+  }
+
+  public void RePath()
+  {
+    Path.ReCalculatePath();
+  }
+
+  // Use this for initialization
   public void ToggleArrow()
   {
         if(arrow.active == true)

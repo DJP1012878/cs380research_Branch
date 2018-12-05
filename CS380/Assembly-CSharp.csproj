@@ -62,8 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Player_Controller\Arrow.cs" />
-    <Compile Include="Assets\Player_Controller\Helper.cs" />
-    <Compile Include="Assets\Player_Controller\Path_Drawer.cs" />
     <Compile Include="Assets\Player_Controller\Player_Stat_Traker.cs" />
     <Compile Include="Assets\Player_Controller\PlayerController.cs" />
     <Compile Include="Assets\Player_Controller\Target.cs" />

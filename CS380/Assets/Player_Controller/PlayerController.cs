@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+    [Header("Player movement")]
     public float turn = 1;
     public float move_Accel = 1;
     public float move = 5;
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour {
 
   void FixedUpdate()
   {
-        //if A then turn left
+      //if A then turn left
       if (Input.GetKey(KeyCode.A))
       {
           gameObject.GetComponent<Transform>().Rotate(Vector3.down * Time.deltaTime * turn);
@@ -57,6 +58,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnCollisionStay(Collision collision)
     {
+        //if the player is on the ground then set the on_ground variable to true
         if(collision.collider.tag == "Ground")
         {
             on_ground = true;
