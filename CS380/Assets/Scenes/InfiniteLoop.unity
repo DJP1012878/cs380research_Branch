@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -450,16 +450,16 @@ MonoBehaviour:
   StartRoom: {fileID: 1911153503022010, guid: f4a4e14ea2209a44681fb04b8e096793, type: 2}
   GoalRoom: {fileID: 1112175893361708, guid: ffb95060adf77ce46b0b5fca9c109239, type: 2}
   Rooms:
-  - {fileID: 1241871945612200, guid: 0a604eed41e2b7a479c7e270b704a14b, type: 2}
   - {fileID: 1697190313238934, guid: 45d6170c7cce84c4698694c92faed1ba, type: 2}
+  - {fileID: 1241871945612200, guid: 0a604eed41e2b7a479c7e270b704a14b, type: 2}
   - {fileID: 1411794661435872, guid: e2ff839b2f6a9e54abb44f948581fb67, type: 2}
   - {fileID: 1932288390480130, guid: 7c05ac098c3a2434399c0e6f5ff76224, type: 2}
   - {fileID: 1032849142095210, guid: 5ad05fc8e5f01504381673c3c71d8d59, type: 2}
   Wall: {fileID: 1649619653136010, guid: b696527eba5c07a4cbeb6aa5644952e9, type: 2}
   m_RoomBaseSize: {x: 10, y: 10, z: 10}
   m_GenerateOnStart: 1
-  m_StartHeight: 7
-  m_StartWidth: 7
+  m_StartHeight: 10
+  m_StartWidth: 10
   m_MinWidth: 5
   m_MinHeight: 5
   m_MinGoalOffset: 5
@@ -469,6 +469,8 @@ MonoBehaviour:
   path: {fileID: 1957054886}
   SetSeed: 1
   seed: 41103
+  p_SortedIndex: 
+  p_SortedRooms: []
 --- !u!4 &329220535
 Transform:
   m_ObjectHideFlags: 0
