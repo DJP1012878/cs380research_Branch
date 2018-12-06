@@ -167,7 +167,7 @@ public class LevelSystem : MonoBehaviour {
             //Debug.Log("Total Heuristic: " + p_TotalHeuristic +
             //  " Allowed Heuristic: " + allowedHeuristic +
             //  " Current Heurisitc: " + currentHeuristic);
-            currentHeuristic += NavMesh.GetAreaCost(p_SortedIndex[range]);
+            currentHeuristic += FindHeuristic(p_SortedIndex[range]);
             ++range;
           }
 
@@ -350,27 +350,7 @@ public class LevelSystem : MonoBehaviour {
     p_TotalHeuristic = 0;
     for (int i = p_RoomIndexOffset; i < (int)Room.RoomIndex; ++i)
     {
-      if(i == (int)Room.HazardRoomA || i == (int)Room.HazardRoomB)//if it's a hazard then divide the area cost by maximum hazard cost
-            {
-                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i)/(path.HazardMinCost+path.HazardMaxCost) +
-                  " at index " + i +
-                  " to TotalHeuristic.");
-                p_TotalHeuristic += NavMesh.GetAreaCost(i) / (path.HazardMinCost + path.HazardMaxCost);
-            }
-      else if(i == (int)Room.ItemRoomA || i == (int)Room.ItemRoomB)//if it's an item then divide the area cost by maximum item cost (get the inverse of that)
-            {
-                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) +
-                  " at index " + i +
-                  " to TotalHeuristic.");
-                p_TotalHeuristic += (1 - (NavMesh.GetAreaCost(i) / (path.ItemMinCost + path.ItemMaxCost)));
-            }
-      else//otherwise it's an empty room and just set the cost to half
-            {
-                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) +
-                  " at index " + i +
-                  " to TotalHeuristic.");
-                p_TotalHeuristic += 0.5f;
-            }
+      p_TotalHeuristic += FindHeuristic(i);
     }
 
     Debug.Log("[LVGEN] Completed Calculating Total Heuristic");
@@ -380,7 +360,7 @@ public class LevelSystem : MonoBehaviour {
     for (int i = p_RoomIndexOffset; i < (int)Room.RoomIndex; ++i)
     {
       Debug.Log("Index " + i +
-        " returned NavMeshCost: " + NavMesh.GetAreaCost(i));
+        " returned NavMeshCost: " + FindHeuristic(i));
       p_SortedIndex.Add(i);
     }
     //Sort by heuristic cost
@@ -405,8 +385,24 @@ public class LevelSystem : MonoBehaviour {
 
   int SortByNavMeshValue(int index1, int index2)
   {
-    return NavMesh.GetAreaCost(index2).CompareTo(
-      NavMesh.GetAreaCost(index1));
+    return FindHeuristic(index2).CompareTo(
+      FindHeuristic(index1));
+  }
+
+  float FindHeuristic(int roomIndex)
+  {
+    if (roomIndex == (int)Room.HazardRoomA || roomIndex == (int)Room.HazardRoomB)//if it's a hazard then divide the area cost by maximum hazard cost
+    {
+      return NavMesh.GetAreaCost(roomIndex) / (path.HazardMinCost + path.HazardMaxCost);
+    }
+    else if (roomIndex == (int)Room.ItemRoomA || roomIndex == (int)Room.ItemRoomB)//if it's an item then divide the area cost by maximum item cost (get the inverse of that)
+    {
+      return (1 - (NavMesh.GetAreaCost(roomIndex) / (path.ItemMinCost + path.ItemMaxCost)));
+    }
+    else//otherwise it's an empty room and just set the cost to half
+    {
+     return 0.5f;
+    }
   }
 
   public void BuildNextLevel()
