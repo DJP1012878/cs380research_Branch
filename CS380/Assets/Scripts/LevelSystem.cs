@@ -16,6 +16,7 @@ public class LevelSystem : MonoBehaviour {
   public GameObject GoalRoom;
   public GameObject[] Rooms;
   public GameObject Wall;
+  public GameObject PatherSystem;
 
   [Header("Room Variables")]
   public Vector3 m_RoomBaseSize;
@@ -66,7 +67,7 @@ public class LevelSystem : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
     }
-
+  
   //Returns success or failure
   public bool GenerateRooms(int height, int width, bool random = false)
   {
@@ -115,110 +116,166 @@ public class LevelSystem : MonoBehaviour {
         IndexDistance(startIndex, goalIndex);
     }
 
-    //Find maximum index distance between the goal and any index
-    float maxIndexDistance = 0;
-    //X Distance
-    if (Mathf.Abs((int)goalIndex.x - (width - 1)) > Mathf.Abs((int)goalIndex.x - 0))
-    {
-      maxIndexDistance += Mathf.Abs((int)goalIndex.x - (width - 1));
-      Debug.Log("Width: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - (width - 1)));
-    }
-    else
-    {
-      maxIndexDistance += Mathf.Abs((int)goalIndex.x - 0);
-      Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - 0));
-    }
-    //Y Distance
-    if (Mathf.Abs((int)goalIndex.y - (height - 1)) > Mathf.Abs((int)goalIndex.y - 0))
-    {
-      maxIndexDistance += Mathf.Abs((int)goalIndex.y - (height - 1));
-      Debug.Log("Height: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - (height - 1)));
-    }
-    else
-    {
-      maxIndexDistance += Mathf.Abs((int)goalIndex.y - 0);
-      Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - 0));
-    }
 
-    Debug.Log("[LVGEN] Max Index Distance from goal is: " + maxIndexDistance);
-    
-    //Create rooms
-    for (int i = 0; i < height; ++i)
+    //Weighted Random Room Generation
+    if (!random)
     {
-      for (int j = 0; j < width; ++j)
+      //Find maximum index distance between the goal and any index
+      float maxIndexDistance = 0;
+      //X Distance
+      if (Mathf.Abs((int)goalIndex.x - (width - 1)) > Mathf.Abs((int)goalIndex.x - 0))
       {
-        GameObject spawnedRoom;
-        int range = 0;                
-        //Set mask value
-        float indexDistance = 
-          IndexDistance(new Vector2(j, i), goalIndex);
-        //Debug.Log("Index Distance from: (" + j + ", " + i + ") is " + indexDistance);
-        float distanceRatio = indexDistance / maxIndexDistance;
-        float allowedHeuristic = p_TotalHeuristic * distanceRatio;
-        float currentHeuristic = 0;
-
-        while (currentHeuristic < allowedHeuristic)
-        {
-          //Debug.Log("Total Heuristic: " + p_TotalHeuristic +
-          //  " Allowed Heuristic: " + allowedHeuristic +
-          //  " Current Heurisitc: " + currentHeuristic);
-          currentHeuristic += NavMesh.GetAreaCost(p_SortedIndex[range]);
-          ++range;
-        }
-
-        if (currentHeuristic != allowedHeuristic)
-          --range;
-           
-        //Range should always be at least 50% of the sorted rooms
-        if (range < (p_SortedRooms.Count * .6f))
-        {
-          range = (int)(p_SortedRooms.Count * .6f);
-        }
-
-        Debug.Log("[LVGEN] Range set to: " + range +
-                  " at Distance Ratio: " + distanceRatio + 
-                  " from index: " + new Vector2(j, i) +
-                  " to goal index: " + goalIndex);
-
-       bool spawn = false;
-       bool goal = false;
-      //Check if start or goal
-      if (i == startIndex.y && j == startIndex.x)
-      {
-          spawnedRoom = Instantiate(StartRoom);
-          spawn = true;
-      }
-      else if (i == goalIndex.y && j == goalIndex.x)
-      {
-          spawnedRoom = Instantiate(GoalRoom);
-          goal = true;
+        maxIndexDistance += Mathf.Abs((int)goalIndex.x - (width - 1));
+        Debug.Log("Width: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - (width - 1)));
       }
       else
-          spawnedRoom =
-            Instantiate(p_SortedRooms[Random.Range(0, range)]);
+      {
+        maxIndexDistance += Mathf.Abs((int)goalIndex.x - 0);
+        Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.x - 0));
+      }
+      //Y Distance
+      if (Mathf.Abs((int)goalIndex.y - (height - 1)) > Mathf.Abs((int)goalIndex.y - 0))
+      {
+        maxIndexDistance += Mathf.Abs((int)goalIndex.y - (height - 1));
+        Debug.Log("Height: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - (height - 1)));
+      }
+      else
+      {
+        maxIndexDistance += Mathf.Abs((int)goalIndex.y - 0);
+        Debug.Log("0: " + goalIndex + " value: " + Mathf.Abs((int)goalIndex.y - 0));
+      }
 
-        Vector3 spawnPos = anchor;
-        spawnPos.x += m_RoomBaseSize.x * j;
-        spawnPos.z += m_RoomBaseSize.z * i;
-        spawnedRoom.transform.position = spawnPos;
+      Debug.Log("[LVGEN] Max Index Distance from goal is: " + maxIndexDistance);
 
-        if(spawn == true)
+      //Create rooms
+      for (int i = 0; i < height; ++i)
+      {
+        for (int j = 0; j < width; ++j)
         {
-           //if it is the startroom, then move the player and path agent there
-           stats.gameObject.transform.position = spawnPos;
-           stats.spawn = spawnedRoom;
-           path.gameObject.GetComponent<NavMeshAgent>().Warp(spawnPos);
-        }
-        else if(goal == true)
-        {
-           path.goal = spawnPos;
-        }
+          GameObject spawnedRoom;
+          int range = 0;
+          //Set mask value
+          float indexDistance =
+            IndexDistance(new Vector2(j, i), goalIndex);
+          //Debug.Log("Index Distance from: (" + j + ", " + i + ") is " + indexDistance);
+          float distanceRatio = indexDistance / maxIndexDistance;
+          float allowedHeuristic = p_TotalHeuristic * distanceRatio;
+          float currentHeuristic = 0;
 
-        //Push into lists
-        m_RoomPositions.Add(spawnPos);
-        m_SpawnedRooms.Add(spawnedRoom);
+          while (currentHeuristic < allowedHeuristic)
+          {
+            //Debug.Log("Total Heuristic: " + p_TotalHeuristic +
+            //  " Allowed Heuristic: " + allowedHeuristic +
+            //  " Current Heurisitc: " + currentHeuristic);
+            currentHeuristic += NavMesh.GetAreaCost(p_SortedIndex[range]);
+            ++range;
+          }
+
+          if (currentHeuristic != allowedHeuristic)
+            --range;
+
+          //Range should always be at least 50% of the sorted rooms
+          if (range < (p_SortedRooms.Count * .6f))
+          {
+            range = (int)(p_SortedRooms.Count * .6f);
+          }
+
+          Debug.Log("[LVGEN] Range set to: " + range +
+                    " at Distance Ratio: " + distanceRatio +
+                    " from index: " + new Vector2(j, i) +
+                    " to goal index: " + goalIndex);
+
+          bool spawn = false;
+          bool goal = false;
+          //Check if start or goal
+          if (i == startIndex.y && j == startIndex.x)
+          {
+            spawnedRoom = Instantiate(StartRoom);
+            spawn = true;
+          }
+          else if (i == goalIndex.y && j == goalIndex.x)
+          {
+            spawnedRoom = Instantiate(GoalRoom);
+            goal = true;
+          }
+          else
+            spawnedRoom =
+              Instantiate(p_SortedRooms[Random.Range(0, range)]);
+
+          Vector3 spawnPos = anchor;
+          spawnPos.x += m_RoomBaseSize.x * j;
+          spawnPos.z += m_RoomBaseSize.z * i;
+          spawnedRoom.transform.position = spawnPos;
+
+          if (spawn == true)
+          {
+            //if it is the startroom, then move the player and path agent there
+            stats.gameObject.transform.position = spawnPos;
+            stats.spawn = spawnedRoom;
+            path.gameObject.GetComponent<NavMeshAgent>().Warp(spawnPos);
+          }
+          else if (goal == true)
+          {
+            path.goal = spawnPos;
+            PatherSystem.GetComponent<PatherSystem>().Destination = spawnPos;
+          }
+
+          //Push into lists
+          m_RoomPositions.Add(spawnPos);
+          m_SpawnedRooms.Add(spawnedRoom);
+        }
       }
     }
+    //Completely random
+    else
+    {
+      //Create rooms
+      for (int i = 0; i < height; ++i)
+      {
+        for (int j = 0; j < width; ++j)
+        {
+          GameObject spawnedRoom;
+          bool spawn = false;
+          bool goal = false;
+          //Check if start or goal
+          if (i == startIndex.y && j == startIndex.x)
+          {
+            spawnedRoom = Instantiate(StartRoom);
+            spawn = true;
+          }
+          else if (i == goalIndex.y && j == goalIndex.x)
+          {
+            spawnedRoom = Instantiate(GoalRoom);
+            goal = true;
+          }
+          else
+            spawnedRoom =
+              Instantiate(Rooms[Random.Range(p_RoomIndexOffset, (int)Room.RoomIndex - 1)]);
+
+          Vector3 spawnPos = anchor;
+          spawnPos.x += m_RoomBaseSize.x * j;
+          spawnPos.z += m_RoomBaseSize.z * i;
+          spawnedRoom.transform.position = spawnPos;
+
+          if (spawn == true)
+          {
+            //if it is the startroom, then move the player and path agent there
+            stats.gameObject.transform.position = spawnPos;
+            stats.spawn = spawnedRoom;
+            path.gameObject.GetComponent<NavMeshAgent>().Warp(spawnPos);
+          }
+          else if (goal == true)
+          {
+            path.goal = spawnPos;
+            PatherSystem.GetComponent<PatherSystem>().Destination = spawnPos;
+          }
+
+          //Push into lists
+          m_RoomPositions.Add(spawnPos);
+          m_SpawnedRooms.Add(spawnedRoom);
+        }
+      }
+   }
 
 
     //Create border walls
