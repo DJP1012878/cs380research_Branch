@@ -16,9 +16,9 @@ NavMeshProjectSettings:
   - name: GoalRoom
     cost: 1
   - name: ItemRoomA
-    cost: 5
+    cost: 4
   - name: ItemRoomB
-    cost: 5
+    cost: 4
   - name: EmptyRoom
     cost: 10
   - name: HazardRoomA

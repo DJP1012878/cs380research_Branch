@@ -176,9 +176,9 @@ public class LevelSystem : MonoBehaviour {
             --range;
 
           //Range should always be at least 50% of the sorted rooms
-          if (range < (p_SortedRooms.Count * .6f))
+          if (range < (p_SortedRooms.Count * .8f))
           {
-            range = (int)(p_SortedRooms.Count * .6f);
+            range = (int)(p_SortedRooms.Count * .8f);
           }
 
           Debug.Log("[LVGEN] Range set to: " + range +
@@ -251,7 +251,7 @@ public class LevelSystem : MonoBehaviour {
           }
           else
             spawnedRoom =
-              Instantiate(Rooms[Random.Range(0, Rooms.Length)]);
+              Instantiate(Rooms[Random.Range(0, Rooms.Length - 1)]);
 
           Vector3 spawnPos = anchor;
           spawnPos.x += m_RoomBaseSize.x * j;
@@ -404,7 +404,7 @@ public class LevelSystem : MonoBehaviour {
     }
     else if (roomIndex == (int)Room.ItemRoomA || roomIndex == (int)Room.ItemRoomB)//if it's an item then divide the area cost by maximum item cost (get the inverse of that)
     {
-      return (1 - (NavMesh.GetAreaCost(roomIndex) / (path.ItemMinCost + path.ItemMaxCost)));
+      return ( 1.0f - (NavMesh.GetAreaCost(roomIndex) / (path.ItemMinCost + path.ItemMaxCost)));
     }
     else//otherwise it's an empty room and just set the cost to half
     {

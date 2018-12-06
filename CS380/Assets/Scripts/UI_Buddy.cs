@@ -22,9 +22,11 @@ public class UI_Buddy : MonoBehaviour {
     public Text Hazard_A_Weight;
     public Text Hazard_B_Weight;
 
+    bool rebuild = false;
+
   public void RebuildLevel()
   {
-     Level.GenerateRooms(Level.m_StartHeight,Level.m_StartWidth);
+     rebuild = true;
   }
 
   public void HazardRatio(float r)
@@ -120,5 +122,12 @@ public class UI_Buddy : MonoBehaviour {
         Hazard_A_Weight.text = tex;
         tex = "Hazard B Weight: " + Mathf.Round(NavMesh.GetAreaCost((int)Room.HazardRoomB) * 100.0f) / 100.0f;
         Hazard_B_Weight.text = tex;
+
+        if(rebuild == true)
+        {
+            Level.GenerateRooms(Level.m_StartHeight, Level.m_StartWidth);
+            Path.ReCalculatePath();
+            rebuild = false;
+        }
     }
 }
