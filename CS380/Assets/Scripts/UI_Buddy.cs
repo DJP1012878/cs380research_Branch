@@ -8,6 +8,7 @@ public class UI_Buddy : MonoBehaviour {
 
     [Header("World Objects")]
     public Player_Stat_Traker stats;
+    public LevelSystem Level;
     public Target Path;
     public GameObject arrow;
     public Renderer Beacon;
@@ -21,10 +22,14 @@ public class UI_Buddy : MonoBehaviour {
     public Text Hazard_A_Weight;
     public Text Hazard_B_Weight;
 
+  public void RebuildLevel()
+  {
+     Level.GenerateRooms(Level.m_StartHeight,Level.m_StartWidth);
+  }
 
   public void HazardRatio(float r)
   {
-    stats.RoomWeights[(int)Room.HazardRoomB] = 1 - r;
+    stats.RoomWeights[(int)Room.HazardRoomA] = 1 - r;
     stats.RoomWeights[(int)Room.HazardRoomB] = r;
     Path.ReWeight();
   }

@@ -250,7 +250,7 @@ public class LevelSystem : MonoBehaviour {
           }
           else
             spawnedRoom =
-              Instantiate(Rooms[Random.Range(p_RoomIndexOffset, (int)Room.RoomIndex - 1)]);
+              Instantiate(Rooms[Random.Range(0, Rooms.Length)]);
 
           Vector3 spawnPos = anchor;
           spawnPos.x += m_RoomBaseSize.x * j;
@@ -350,10 +350,27 @@ public class LevelSystem : MonoBehaviour {
     p_TotalHeuristic = 0;
     for (int i = p_RoomIndexOffset; i < (int)Room.RoomIndex; ++i)
     {
-      Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) + 
-        " at index " + i +
-        " to TotalHeuristic.");
-      p_TotalHeuristic += NavMesh.GetAreaCost(i);
+      if(i == (int)Room.HazardRoomA || i == (int)Room.HazardRoomB)//if it's a hazard then divide the area cost by maximum hazard cost
+            {
+                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i)/(path.HazardMinCost+path.HazardMaxCost) +
+                  " at index " + i +
+                  " to TotalHeuristic.");
+                p_TotalHeuristic += NavMesh.GetAreaCost(i) / (path.HazardMinCost + path.HazardMaxCost);
+            }
+      else if(i == (int)Room.ItemRoomA || i == (int)Room.ItemRoomB)//if it's an item then divide the area cost by maximum item cost (get the inverse of that)
+            {
+                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) +
+                  " at index " + i +
+                  " to TotalHeuristic.");
+                p_TotalHeuristic += (1 - (NavMesh.GetAreaCost(i) / (path.ItemMinCost + path.ItemMaxCost)));
+            }
+      else//otherwise it's an empty room and just set the cost to half
+            {
+                Debug.Log("Adding value: " + NavMesh.GetAreaCost(i) +
+                  " at index " + i +
+                  " to TotalHeuristic.");
+                p_TotalHeuristic += 0.5f;
+            }
     }
 
     Debug.Log("[LVGEN] Completed Calculating Total Heuristic");
