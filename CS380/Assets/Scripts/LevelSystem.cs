@@ -48,11 +48,13 @@ public class LevelSystem : MonoBehaviour {
   float p_TotalHeuristic;
   public List<int> p_SortedIndex;
   public List<GameObject> p_SortedRooms;   //Possible Usage to sort by heuristic cost
+  public List<GameObject> p_SpawnedWalls;
 
     private void Awake()
     {
         p_SortedRooms = new List<GameObject>();
         m_SpawnedRooms = new List<GameObject>();
+    p_SpawnedWalls = new List<GameObject>();
     p_SortedIndex = new List<int>();
 
         if (m_GenerateOnStart)
@@ -82,9 +84,14 @@ public class LevelSystem : MonoBehaviour {
 
     //Reset Lists
     m_RoomPositions.Clear();
+    Debug.Log("[LVGEN] Destroying previous rooms");
     for (int i = 0; i < m_SpawnedRooms.Count; ++i)
       Destroy(m_SpawnedRooms[i]);
     m_SpawnedRooms.Clear();
+    Debug.Log("[LVGEN] Destroying previous walls");
+    for (int i = 0; i < p_SpawnedWalls.Count; ++i)
+      Destroy(p_SpawnedWalls[i]);
+    p_SpawnedWalls.Clear();
 
     //Check that given parameters are valid
     if (height < m_MinHeight)
@@ -305,6 +312,7 @@ public class LevelSystem : MonoBehaviour {
         new Vector3(spawnedWall.transform.eulerAngles.x,
                     spawnedWall.transform.eulerAngles.y,
                     zRot);
+      p_SpawnedWalls.Add(spawnedWall);
     }
     zRot = 0;
     for (int i = 0; i < width; ++i)
@@ -330,6 +338,7 @@ public class LevelSystem : MonoBehaviour {
         new Vector3(spawnedWall.transform.eulerAngles.x,
                     spawnedWall.transform.eulerAngles.y,
                     zRot);
+      p_SpawnedWalls.Add(spawnedWall);
     }
 
     //Create inner walls
