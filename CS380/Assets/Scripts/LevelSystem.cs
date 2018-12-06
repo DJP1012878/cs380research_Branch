@@ -301,6 +301,7 @@ public class LevelSystem : MonoBehaviour {
         new Vector3(spawnedWall.transform.eulerAngles.x,
                     spawnedWall.transform.eulerAngles.y,
                     zRot);
+      p_SpawnedWalls.Add(spawnedWall);
 
       spawnPos = anchor;
       spawnPos.x += m_RoomBaseSize.x * width;
@@ -327,6 +328,7 @@ public class LevelSystem : MonoBehaviour {
         new Vector3(spawnedWall.transform.eulerAngles.x,
                     spawnedWall.transform.eulerAngles.y,
                     zRot);
+      p_SpawnedWalls.Add(spawnedWall);
 
       spawnPos = anchor;
       spawnPos.x += m_RoomBaseSize.x * i;

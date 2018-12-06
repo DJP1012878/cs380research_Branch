@@ -814,10 +814,11 @@ MonoBehaviour:
   m_SpawnedRooms: []
   stats: {fileID: 2022460330}
   path: {fileID: 1957054886}
-  SetSeed: 1
+  SetSeed: 0
   seed: 41103
   p_SortedIndex: 
   p_SortedRooms: []
+  p_SpawnedWalls: []
 --- !u!4 &329220535
 Transform:
   m_ObjectHideFlags: 0
