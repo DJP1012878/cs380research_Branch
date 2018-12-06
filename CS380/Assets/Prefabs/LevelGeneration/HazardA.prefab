@@ -375,7 +375,7 @@ GameObject:
   - component: {fileID: 65152091404545460}
   m_Layer: 0
   m_Name: EnterTrigger
-  m_TagString: HazardA
+  m_TagString: HazardAEnter
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1012,7 +1012,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1932288390480130}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -44.52574, y: 81.28256, z: -34.935707}
+  m_LocalPosition: {x: -53.612, y: -5.70975, z: -53.27606}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4106776478186758}

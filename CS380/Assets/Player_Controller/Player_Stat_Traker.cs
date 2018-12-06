@@ -49,8 +49,8 @@ public class Player_Stat_Traker : MonoBehaviour {
   public void SetRoomWeights()
   {
     //calculate the death and item ratios
-    AB_DeathRatio = ((Deaths_A) / ((Deaths_A + Deaths_B)));
-    BA_DeathRatio = ((Deaths_B) / ((Deaths_A + Deaths_B)));
+    AB_DeathRatio = ((Deaths_A / Hazard_A_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
+    BA_DeathRatio = ((Deaths_B / Hazard_B_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
     Item_A_Left = 1.0f - (Item_A_Amount - Item_A) / Item_A_Amount;
     Item_B_Left = 1.0f - (Item_B_Amount - Item_B) / Item_B_Amount;
 
@@ -99,8 +99,8 @@ public class Player_Stat_Traker : MonoBehaviour {
         respawn = true;
         gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        AB_DeathRatio = ((Deaths_A) / ((Deaths_A + Deaths_B)));
-        BA_DeathRatio = ((Deaths_B) / ((Deaths_A + Deaths_B)));
+        AB_DeathRatio = ((Deaths_A/Hazard_A_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
+        BA_DeathRatio = ((Deaths_B/Hazard_B_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
         RoomWeights[(int)Room.HazardRoomA] = AB_DeathRatio;
         RoomWeights[(int)Room.HazardRoomB] = BA_DeathRatio;
       }
@@ -112,8 +112,8 @@ public class Player_Stat_Traker : MonoBehaviour {
         respawn = true;
         gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-        AB_DeathRatio = ((Deaths_A) / ((Deaths_A + Deaths_B)));
-        BA_DeathRatio = ((Deaths_B) / ((Deaths_A + Deaths_B)));
+        AB_DeathRatio = ((Deaths_A / Hazard_A_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
+        BA_DeathRatio = ((Deaths_B / Hazard_B_Enter) / (((Deaths_A / Hazard_A_Enter) + (Deaths_B / Hazard_B_Enter))));
         RoomWeights[(int)Room.HazardRoomA] = AB_DeathRatio;
         RoomWeights[(int)Room.HazardRoomB] = BA_DeathRatio;
       }
@@ -128,6 +128,7 @@ public class Player_Stat_Traker : MonoBehaviour {
           Item_A_Left = 1.0f - (Item_A_Amount - Item_A) / Item_A_Amount;
           Destroy(other.gameObject);
           RoomWeights[(int)Room.ItemRoomA] = Item_A_Left;
+          SetRoomWeights();
       }
       if (other.tag == "ItemB" && cooldown == false)//if itemB then increment itemB and destroy the object
       {
@@ -136,18 +137,21 @@ public class Player_Stat_Traker : MonoBehaviour {
           Item_B_Left = 1.0f - (Item_B_Amount - Item_B) / Item_B_Amount;
           Destroy(other.gameObject);
           RoomWeights[(int)Room.ItemRoomB] = Item_B_Left;
+          SetRoomWeights();
       }
       if (other.tag == "HazardAEnter" && cooldown == false)//if hazard A then increment hazard A
       {
           cooldown = true;
           ++Hazard_A_Enter;
           Destroy(other.gameObject);
+          SetRoomWeights();
       }
       if (other.tag == "HazardBEnter" && cooldown == false)//if hazard B then increment hazard B
       {
           cooldown = true;
           ++Hazard_B_Enter;
           Destroy(other.gameObject);
+          SetRoomWeights();
       }
 
       //if the player entered the goal then regenerate the room and recalculate the path

@@ -13,6 +13,7 @@ public class UI_Buddy : MonoBehaviour {
     public GameObject arrow;
     public Renderer Beacon;
     public LineRenderer String;
+    public Camera player;
 
     [Header("UI")]
     public Text Item_A_Counter;
@@ -24,6 +25,18 @@ public class UI_Buddy : MonoBehaviour {
 
     bool rebuild = false;
 
+  public void Play()
+  {
+    if(player.enabled == true)
+    {
+        player.enabled = false;
+    }
+    else
+    {
+        player.enabled = true;
+    }
+  }
+
   public void RebuildLevel()
   {
      rebuild = true;
@@ -31,6 +44,7 @@ public class UI_Buddy : MonoBehaviour {
 
   public void HazardRatio(float r)
   {
+    if(r == 1) { r = 0.9999999f; }//i have no idea why, but if the ratio contains a whole number, then it has a percent chance of failing the level generation
     stats.RoomWeights[(int)Room.HazardRoomA] = 1 - r;
     stats.RoomWeights[(int)Room.HazardRoomB] = r;
     Path.ReWeight();
@@ -38,12 +52,14 @@ public class UI_Buddy : MonoBehaviour {
 
   public void ItemARatio(float r)
   {
+    if (r == 1) { r = 0.9999999f; }//i have no idea why, but if the ratio contains a whole number, then it has a percent chance of failing the level generation
     stats.RoomWeights[(int)Room.ItemRoomA] = r;
     Path.ReWeight();
   }
 
   public void ItemBRatio(float r)
   {
+    if (r == 1) { r = 0.9999999f; } //i have no idea why, but if the ratio contains a whole number, then it has a percent chance of failing the level generation}
     stats.RoomWeights[(int)Room.ItemRoomB] = r;
     Path.ReWeight();
   }
