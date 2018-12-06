@@ -17,6 +17,7 @@ public class LevelSystem : MonoBehaviour {
   public GameObject[] Rooms;
   public GameObject Wall;
   public GameObject PatherSystem;
+  public GameObject Camera;
 
   [Header("Room Variables")]
   public Vector3 m_RoomBaseSize;
@@ -333,6 +334,12 @@ public class LevelSystem : MonoBehaviour {
 
     //Create inner walls
 
+    //Set Camera to center
+    Vector3 cameraPos;
+    cameraPos.x = m_SpawnedRooms[0].transform.position.x / 2.0f;
+    cameraPos.y = 100.0f;
+    cameraPos.z = m_SpawnedRooms[0].transform.position.z / 2.0f;
+    Camera.transform.position = cameraPos;
 
     return true;
   }
