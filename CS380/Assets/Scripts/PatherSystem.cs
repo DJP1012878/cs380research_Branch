@@ -9,6 +9,7 @@ public class PatherSystem : MonoBehaviour {
   public Vector3 Destination;
 
   GameObject PlayerObject;
+  GameObject SpawnedPather;
 
 	// Use this for initialization
 	void Start () {
@@ -20,8 +21,12 @@ public class PatherSystem : MonoBehaviour {
 		if ( Input.GetKeyDown(KeyCode.P))
     {
       Debug.Log("[Pather] Spawning Safe Pather");
-      GameObject pather = Instantiate(PatherSafe);
-      pather.GetComponent<PatherObject>().Destination = Destination;
+      if (SpawnedPather != null)
+      {
+        Destroy(SpawnedPather);
+      }
+      SpawnedPather = Instantiate(PatherSafe);
+      SpawnedPather.GetComponent<PatherObject>().Destination = Destination;
     }
 	}
 }
